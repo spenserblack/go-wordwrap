@@ -33,7 +33,13 @@ func WordWrap(s string, limit int) (lines []string) {
 
 	runes := []rune(s)
 	for i, char := range runes {
-		if unicode.IsSpace(char) {
+		var lookAhead *rune
+		if i < len(runes)-1 {
+			lookAhead = &runes[i+1]
+		}
+		if lookAhead != nil && unicode.IsSpace(*lookAhead) {
+			bp = spacepoint(i + 1)
+		} else if unicode.IsSpace(char) {
 			bp = spacepoint(i)
 		} else if char == '-' {
 			bp = hyphenpoint(i)
