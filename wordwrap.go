@@ -62,7 +62,8 @@ func WordWrap(s string, limit int) (lines []string) {
 
 	for i, bp := range breakpoints[1:] {
 		prev := breakpoints[i]
-		lines = append(lines, string(runes[prev.End():bp.Start()]))
+		line := runes[prev.End():bp.Start()]
+		lines = append(lines, string(line))
 	}
 
 	lines = append(lines, string(runes[breakpoints[len(breakpoints)-1].End():]))
