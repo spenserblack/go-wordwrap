@@ -15,10 +15,9 @@ func Example() {
 		fmt.Println(line)
 	}
 	// Output:
-	// this
-	// test-
-	// string
-	// has been
+	// this test-
+	// string has
+	// been
 	// wrapped
 	// successful
 	// ly
@@ -43,7 +42,7 @@ func ExampleWordWrap_hyphen() {
 	}
 	// Output:
 	// hyphenated-
-	// at spaces
+	// words
 }
 
 // Words that are too long for the limit will be broken.
