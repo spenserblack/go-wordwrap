@@ -10,7 +10,7 @@ import (
 // trimmed, hyphens are kept. If a word is too long to fit in the limit, it
 // will be broken at the limit.
 func Example() {
-	lines := wordwrap.WordWrap("this test-string has been wrapped successfully", 10)
+	lines := wordwrap.WordWrap("this test-string has been successfully wrapped successfully", 10)
 	for _, line := range lines {
 		fmt.Println(line)
 	}
@@ -18,7 +18,8 @@ func Example() {
 	// this test-
 	// string has
 	// been
-	// wrapped
+	// successful
+	// ly wrapped
 	// successful
 	// ly
 }
