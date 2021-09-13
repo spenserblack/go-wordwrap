@@ -31,7 +31,8 @@ func WordWrap(s string, limit int) (lines []string) {
 	}
 	reset()
 
-	for i, char := range s {
+	runes := []rune(s)
+	for i, char := range runes {
 		if unicode.IsSpace(char) {
 			bp = spacepoint(i)
 		} else if char == '-' {
@@ -52,18 +53,18 @@ func WordWrap(s string, limit int) (lines []string) {
 		return []string{s}
 	}
 
-	lines = append(lines, s[:breakpoints[0].Start()])
+	lines = append(lines, string(runes[:breakpoints[0].Start()]))
 	if len(breakpoints) == 1 {
-		lines = append(lines, s[breakpoints[0].End():])
+		lines = append(lines, string(runes[breakpoints[0].End():]))
 		return
 	}
 
 	for i, bp := range breakpoints[1:] {
 		prev := breakpoints[i]
-		lines = append(lines, s[prev.End():bp.Start()])
+		lines = append(lines, string(runes[prev.End():bp.Start()]))
 	}
 
-	lines = append(lines, s[breakpoints[len(breakpoints)-1].End():])
+	lines = append(lines, string(runes[breakpoints[len(breakpoints)-1].End():]))
 
 	return
 }
