@@ -25,11 +25,6 @@ func WordWrap(s string, limit int) (lines []string) {
 	breakpoints := make([]breakpoint, 0)
 	var bp breakpoint
 	var currentLen int
-	reset := func() {
-		bp = nil
-		currentLen = 0
-	}
-	reset()
 
 	runes := []rune(s)
 	for i, char := range runes {
@@ -51,7 +46,13 @@ func WordWrap(s string, limit int) (lines []string) {
 				bp = defaultpoint(i)
 			}
 			breakpoints = append(breakpoints, bp)
-			reset()
+			if bp.End() <= i {
+				previousRunes := runes[bp.End():i]
+				currentLen = runewidth.StringWidth(string(previousRunes))
+			} else {
+				currentLen = 0
+			}
+			bp = nil
 		}
 	}
 
