@@ -16,6 +16,20 @@ func TestNoLimit(t *testing.T) {
 	}
 }
 
+// TestLimitGreaterThanString tests that a limit that is greater than the input
+// string will not break the string up.
+func TestLimitGreaterThanString(t *testing.T) {
+	in := "this is a test string"
+	out := WordWrap(in, 100)
+
+	if l := len(out); l != 1 {
+		t.Fatalf(`len = %d, want 1`, l)
+	}
+	if word := out[0]; word != in {
+		t.Errorf(`word = %q, want %q`, word, in)
+	}
+}
+
 // TestSpacesWithLimit tests that a word with a limit and spaces will be
 // wrapped at spaces to fit in that limit.
 func TestSpacesWithLimit(t *testing.T) {
