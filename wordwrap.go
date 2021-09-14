@@ -35,7 +35,14 @@ func WordWrap(s string, limit int) (lines []string) {
 		}
 		currentLen += runewidth.RuneWidth(char)
 
-		if currentLen >= limit {
+		var breakLen int
+		if bp != nil {
+			breakLen = bp.Len()
+		} else {
+			breakLen = 0
+		}
+
+		if currentLen+breakLen >= limit {
 			if bp == nil {
 				bp = defaultpoint(i)
 			}
@@ -80,6 +87,10 @@ type breakpoint interface {
 	Start() int
 	// End is where the break should end.
 	End() int
+	// Len is the length of the break point. It should be 0 if it doesn't add or
+	// remove any text, greater than 0 if it adds any characters, and less than 0
+	// if it removes any characters.
+	Len() int
 }
 
 // Spacepoint is a breakpoint triggered by whitespace.
@@ -91,6 +102,9 @@ func (p spacepoint) Start() int {
 func (p spacepoint) End() int {
 	return int(p) + 1
 }
+func (p spacepoint) Len() int {
+	return -1
+}
 
 // Hyphenpoint is a breakpoint triggered by a hyphen.
 type hyphenpoint int
@@ -101,6 +115,9 @@ func (p hyphenpoint) Start() int {
 func (p hyphenpoint) End() int {
 	return int(p) + 1
 }
+func (p hyphenpoint) Len() int {
+	return 0
+}
 
 // Defaultpoint occurs when there is no available trigger for breakage.
 type defaultpoint int
@@ -110,4 +127,7 @@ func (p defaultpoint) Start() int {
 }
 func (p defaultpoint) End() int {
 	return int(p) + 1
+}
+func (p defaultpoint) Len() int {
+	return 0
 }
