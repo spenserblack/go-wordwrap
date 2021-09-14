@@ -46,6 +46,9 @@ func WordWrap(s string, limit int) (lines []string) {
 			if bp == nil {
 				bp = defaultpoint(i)
 			}
+			if bp.End() == len(runes) {
+				break
+			}
 			breakpoints = append(breakpoints, bp)
 			if bp.End() <= i {
 				previousRunes := runes[bp.End():i]
