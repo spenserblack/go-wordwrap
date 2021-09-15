@@ -38,13 +38,14 @@ func WordWrap(s string, limit int) (lines []string) {
 
 	for i, char := range s {
 		lengthModifier := 0
+		charWidth := runewidth.RuneWidth(char)
 		if unicode.IsSpace(char) {
 			spacepoint = i
-			lengthModifier = -1
+			lengthModifier = -charWidth
 		} else if char == '-' {
 			hyphenpoint = i
 		}
-		currentLen += runewidth.RuneWidth(char)
+		currentLen += charWidth
 
 		if currentLen+lengthModifier >= limit {
 			var endpoint int
