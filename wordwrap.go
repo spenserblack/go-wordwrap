@@ -48,6 +48,10 @@ func WordWrap(s string, limit int) (lines []string) {
 		currentLen += charWidth
 
 		if currentLen+lengthModifier >= limit {
+			// NOTE If the next char is a space, break shouldn't occur yet.
+			if runes := []rune(s[i:]); len(runes) > 1 && unicode.IsSpace(runes[1]) {
+				continue
+			}
 			var endpoint int
 			switch {
 			case hyphenpoint != undefined:
