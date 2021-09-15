@@ -52,6 +52,10 @@ func WordWrap(s string, limit int) (lines []string) {
 			if runes := []rune(s[i:]); len(runes) > 1 && unicode.IsSpace(runes[1]) {
 				continue
 			}
+			// NOTE If this is the very end of the string, break is not necessary
+			if i+len(string(char)) == len(s) {
+				break
+			}
 			var endpoint int
 			switch {
 			case hyphenpoint != undefined:
