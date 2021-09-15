@@ -7,6 +7,9 @@ import (
 	"github.com/mattn/go-runewidth"
 )
 
+// Undefined means that the break point is not defined.
+const undefined int = -1
+
 // WordWrap wraps a string, where each "line" of the wrapped string is an item
 // of a slice of strings. A limit of zero or less is treated as an infinite
 // limit.
@@ -22,64 +25,49 @@ func WordWrap(s string, limit int) (lines []string) {
 		return []string{s}
 	}
 
-	breakpoints := make([]breakpoint, 0)
-	var bp breakpoint
-	var currentLen int
+	var (
+		startpoint  int = 0
+		currentLen  int = 0
+		hyphenpoint int = undefined
+		spacepoint  int = undefined
+	)
+	reset := func() {
+		hyphenpoint = undefined
+		spacepoint = undefined
+	}
 
-	runes := []rune(s)
-	for i, char := range runes {
+	for i, char := range s {
+		lengthModifier := 0
 		if unicode.IsSpace(char) {
-			bp = spacepoint(i)
+			spacepoint = i
+			lengthModifier = -1
 		} else if char == '-' {
-			bp = hyphenpoint(i)
+			hyphenpoint = i
 		}
 		currentLen += runewidth.RuneWidth(char)
 
-		var breakLen int
-		if bp != nil {
-			breakLen = bp.Len()
-		} else {
-			breakLen = 0
-		}
-
-		if currentLen+breakLen >= limit {
-			if bp == nil {
-				bp = defaultpoint(i)
+		if currentLen+lengthModifier >= limit {
+			var endpoint int
+			switch {
+			case hyphenpoint != undefined:
+				lines = append(lines, s[startpoint:hyphenpoint+1])
+				endpoint = hyphenpoint + 1
+			case spacepoint != undefined:
+				lines = append(lines, s[startpoint:spacepoint])
+				endpoint = spacepoint + 1
+			default:
+				lines = append(lines, s[startpoint:i+1])
+				endpoint = i + 1
 			}
-			if bp.End() == len(runes) {
-				break
-			}
-			breakpoints = append(breakpoints, bp)
-			if bp.End() <= i {
-				previousRunes := runes[bp.End():i]
-				currentLen = runewidth.StringWidth(string(previousRunes))
-				if !unicode.IsSpace(char) {
-					currentLen += runewidth.RuneWidth(char)
-				}
-			} else {
-				currentLen = 0
-			}
-			bp = nil
+			remainder := s[endpoint : i+1]
+			currentLen = runewidth.StringWidth(remainder)
+			startpoint = endpoint
+			reset()
 		}
 	}
 
-	if len(breakpoints) == 0 {
-		return []string{s}
+	if trail := s[startpoint:]; trail != "" {
+		lines = append(lines, trail)
 	}
-
-	lines = append(lines, string(runes[:breakpoints[0].Start()]))
-	if len(breakpoints) == 1 {
-		lines = append(lines, string(runes[breakpoints[0].End():]))
-		return
-	}
-
-	for i, bp := range breakpoints[1:] {
-		prev := breakpoints[i]
-		line := runes[prev.End():bp.Start()]
-		lines = append(lines, string(line))
-	}
-
-	lines = append(lines, string(runes[breakpoints[len(breakpoints)-1].End():]))
-
 	return
 }
