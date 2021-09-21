@@ -19,7 +19,7 @@ for _, line := range lines {
 
 ### Output
 
-```
+```console
 this test-
 string has
 been
