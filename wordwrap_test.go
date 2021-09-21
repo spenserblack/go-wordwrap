@@ -86,3 +86,43 @@ func TestTooLong(t *testing.T) {
 		}
 	}
 }
+
+// TestEndOfString tests that a wrap does not occur at the end of a string when
+// the length of the string is a multiple of the limit.
+//
+// In other words, a wrap should not occur when the last line's length equals
+// the limit.
+func TestEndOfString(t *testing.T) {
+	in := "12345"
+	out := WordWrap(in, 5)
+
+	if l := len(out); l != 1 {
+		t.Errorf(`length = %d, want 1`, l)
+	}
+	if out[0] != in {
+		t.Errorf(`out[0] = %q, want %q`, out[0], in)
+	}
+}
+
+// TestNoWrapBeforeSpace tests that a wrap does not occur on a space when the
+// wrap could occur at a later space and still be within the limit.
+//
+// In other words, if a space would be the character to put the line over the
+// limit, it is *that* space that should be wrapped, not the previous.
+func TestNoWrapBeforeSpace(t *testing.T) {
+	in := "1 3 5 7 9"
+	out := WordWrap(in, 5)
+	expected := []string{"1 3 5", "7 9"}
+
+	if l := len(out); l > len(expected) {
+		t.Errorf(`extra lines after expected output: %#v`, out[len(expected):])
+	} else if l < len(expected) {
+		t.Fatalf(`not enough lines: %#v`, out)
+	}
+
+	for index, want := range expected {
+		if line := out[index]; line != want {
+			t.Errorf(`line %d = %q, want %q`, index+1, line, want)
+		}
+	}
+}
