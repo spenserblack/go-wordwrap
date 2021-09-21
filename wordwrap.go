@@ -1,4 +1,5 @@
-// Package wordwrap is the main package.
+// Package wordwrap provides a word-wrapping function that returns the wrapped
+// lines as a slice of strings.
 package wordwrap
 
 import (
