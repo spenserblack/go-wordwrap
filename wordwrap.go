@@ -27,10 +27,11 @@ func WordWrap(s string, limit int) (lines []string) {
 	}
 
 	var (
-		startpoint  int = 0
-		currentLen  int = 0
-		hyphenpoint int = undefined
-		spacepoint  int = undefined
+		startpoint    int = 0
+		currentLen    int = 0
+		hyphenpoint   int = undefined
+		spacepoint    int = undefined
+		lastCharIndex int
 	)
 	reset := func() {
 		hyphenpoint = undefined
@@ -38,25 +39,15 @@ func WordWrap(s string, limit int) (lines []string) {
 	}
 
 	for i, char := range s {
-		lengthModifier := 0
 		charWidth := runewidth.RuneWidth(char)
 		if unicode.IsSpace(char) {
 			spacepoint = i
-			lengthModifier = -charWidth
 		} else if char == '-' {
 			hyphenpoint = i
 		}
 		currentLen += charWidth
 
-		if currentLen+lengthModifier >= limit {
-			// NOTE If the next char is a space, break shouldn't occur yet.
-			if runes := []rune(s[i:]); len(runes) > 1 && unicode.IsSpace(runes[1]) {
-				continue
-			}
-			// NOTE If this is the very end of the string, break is not necessary
-			if i+len(string(char)) == len(s) {
-				break
-			}
+		if currentLen > limit {
 			var endpoint int
 			switch {
 			case hyphenpoint != undefined:
@@ -66,14 +57,16 @@ func WordWrap(s string, limit int) (lines []string) {
 				lines = append(lines, s[startpoint:spacepoint])
 				endpoint = spacepoint + 1
 			default:
-				lines = append(lines, s[startpoint:i+1])
-				endpoint = i + 1
+				lines = append(lines, s[startpoint:lastCharIndex+1])
+				endpoint = lastCharIndex + 1
 			}
 			remainder := s[endpoint : i+1]
 			currentLen = runewidth.StringWidth(remainder)
 			startpoint = endpoint
 			reset()
 		}
+
+		lastCharIndex = i
 	}
 
 	if trail := s[startpoint:]; trail != "" {
